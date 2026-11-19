@@ -24,7 +24,8 @@ export interface LiveWeatherData {
 }
 
 function getApiKey(): string {
-  const envKey = import.meta.env.VITE_OPENWEATHER_API_KEY
+  const env = (import.meta as unknown as { env?: Record<string, string> }).env
+  const envKey = env?.VITE_OPENWEATHER_API_KEY
   return (envKey && envKey.trim()) ? envKey.trim() : ''
 }
 
