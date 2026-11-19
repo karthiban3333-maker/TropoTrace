@@ -1,8 +1,24 @@
 # ⚡ TropoTrace — Convective Intelligence Command Center
 
-> **A hyperlocal convective storm tracking and atmospheric intelligence platform built with React, TypeScript, Vite, Leaflet, and Firebase.**
+> **A hyperlocal convective storm tracking, nowcasting, and atmospheric intelligence command center built with React, TypeScript, Vite, Leaflet, and Firebase.**
 
 TropoTrace is a real-time convective storm tracking, nowcasting, and disaster mitigation command center. It equips meteorologists, emergency response teams, and civil protection operators with advanced situational awareness for monitoring extreme convective phenomena — including lightning swarms, hail cores, downbursts, and flash-flood producing cloudbursts.
+
+---
+
+## 📖 About the Project
+
+### 🎯 Problem Statement
+Severe convective storms — characterized by rapid initiation, localized cloudbursts, severe lightning, and damaging hail — develop within minutes and represent some of the hardest meteorological phenomena to nowcast. Traditional synoptic-scale weather models lack the spatial resolution and update frequency needed for local disaster response teams, leaving urban centers and transit corridors unprepared for sudden atmospheric hazards.
+
+### 💡 The Solution
+TropoTrace bridges the critical gap between synoptic weather forecasts and tactical nowcasting. It assimilates live radar simulations, automated convective cell tracking algorithms, lightning density streams, and terrain models into a single reactive GIS command display. Operators can run live scenario simulations, evaluate infrastructure impact timelines, verify model skill metrics, consult an AI meteorological analyst, and compose multi-language public warning dispatches in seconds.
+
+### 🌟 Core Value Proposition
+- **High-Resolution Convective Nowcasting**: Real-time cell tracking estimating storm speed, direction, vertical reflectivity, and precise arrival times (ETA).
+- **Tactical Infrastructure Risk Modeling**: Assesses population exposure, road transit blockages, and critical infrastructure vulnerability.
+- **Interactive Simulation Lab**: Includes 4 realistic, pre-configured convective weather scenarios for operator training and disaster drills.
+- **Automated Verification & AI Advisory**: Continuously grades forecast skill (MAE, RMSE, POD, CSI) alongside a specialized AI meteorological copilot.
 
 ---
 
