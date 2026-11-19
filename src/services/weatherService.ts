@@ -117,77 +117,74 @@ export async function fetchLiveWeather(
         cachedWeather = { data: weatherResult, expiresAt: now + 45000 }
         return weatherResult
       }
-    } catch {
-      // Fall through to Open-Meteo fallback
+    } catch (err) {
+      console.warn('OpenWeatherMap primary fetch warning, falling back to live mesonet:', err)
     }
   }
-  } catch (err) {
-    console.warn('OpenWeatherMap primary fetch warning, falling back to live mesonet:', err)
-  }
 
-  // 2. High-Reliability Secondary Fallback (Open-Meteo High-Resolution Mesonet)
-  // This guarantees live real-world temperature, humidity, and wind are ALWAYS available even if OWM key is freshly created or throttled!
-  try {
-    const fallbackUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&timezone=auto`
-    const fbRes = await fetch(fallbackUrl, { signal: AbortSignal.timeout(6000) })
+// 2. High-Reliability Secondary Fallback (Open-Meteo High-Resolution Mesonet)
+// This guarantees live real-world temperature, humidity, and wind are ALWAYS available even if OWM key is freshly created or throttled!
+try {
+  const fallbackUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&timezone=auto`
+  const fbRes = await fetch(fallbackUrl, { signal: AbortSignal.timeout(6000) })
 
-    if (fbRes.ok) {
-      const fbData = await fbRes.json()
-      const curr = fbData.current
-      const wmo = wmoToCondition(curr.weather_code)
+  if (fbRes.ok) {
+    const fbData = await fbRes.json()
+    const curr = fbData.current
+    const wmo = wmoToCondition(curr.weather_code)
 
-      const weatherResult: LiveWeatherData = {
-        city: city || defaultCity,
-        country: 'IN',
-        lat,
-        lon,
-        temp: Math.round(curr.temperature_2m * 10) / 10,
-        feelsLike: Math.round(curr.apparent_temperature * 10) / 10,
-        tempMin: Math.round((curr.temperature_2m - 1.5) * 10) / 10,
-        tempMax: Math.round((curr.temperature_2m + 2.0) * 10) / 10,
-        humidity: curr.relative_humidity_2m,
-        pressure: Math.round(curr.surface_pressure),
-        windSpeedKmH: Math.round(curr.wind_speed_10m * 10) / 10,
-        windDirection: degToCompass(curr.wind_direction_10m),
-        windDeg: curr.wind_direction_10m,
-        condition: wmo.condition,
-        description: wmo.description,
-        icon: wmo.icon,
-        visibilityKm: 10,
-        rain1h: curr.rain,
-        source: 'OpenWeather Sensor Network / Live Mesonet',
-        fetchedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-      }
-
-      cachedWeather = { data: weatherResult, expiresAt: now + 45000 }
-      return weatherResult
+    const weatherResult: LiveWeatherData = {
+      city: city || defaultCity,
+      country: 'IN',
+      lat,
+      lon,
+      temp: Math.round(curr.temperature_2m * 10) / 10,
+      feelsLike: Math.round(curr.apparent_temperature * 10) / 10,
+      tempMin: Math.round((curr.temperature_2m - 1.5) * 10) / 10,
+      tempMax: Math.round((curr.temperature_2m + 2.0) * 10) / 10,
+      humidity: curr.relative_humidity_2m,
+      pressure: Math.round(curr.surface_pressure),
+      windSpeedKmH: Math.round(curr.wind_speed_10m * 10) / 10,
+      windDirection: degToCompass(curr.wind_direction_10m),
+      windDeg: curr.wind_direction_10m,
+      condition: wmo.condition,
+      description: wmo.description,
+      icon: wmo.icon,
+      visibilityKm: 10,
+      rain1h: curr.rain,
+      source: 'OpenWeather Sensor Network / Live Mesonet',
+      fetchedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
     }
-  } catch (err) {
-    console.error('All live weather providers failed:', err)
-  }
 
-  // 3. Static fallback safeguard if device is totally offline
-  return {
-    city: city || defaultCity,
-    country: 'IN',
-    lat,
-    lon,
-    temp: 27.4,
-    feelsLike: 29.8,
-    tempMin: 24.0,
-    tempMax: 31.0,
-    humidity: 74,
-    pressure: 1012,
-    windSpeedKmH: 14.2,
-    windDirection: 'WSW',
-    windDeg: 245,
-    condition: 'Convective Clouds',
-    description: 'scattered thunderstorm clouds',
-    icon: '03d',
-    visibilityKm: 9.0,
-    source: 'Ambient AWS Ground Reference',
-    fetchedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    cachedWeather = { data: weatherResult, expiresAt: now + 45000 }
+    return weatherResult
   }
+} catch (err) {
+  console.error('All live weather providers failed:', err)
+}
+
+// 3. Static fallback safeguard if device is totally offline
+return {
+  city: city || defaultCity,
+  country: 'IN',
+  lat,
+  lon,
+  temp: 27.4,
+  feelsLike: 29.8,
+  tempMin: 24.0,
+  tempMax: 31.0,
+  humidity: 74,
+  pressure: 1012,
+  windSpeedKmH: 14.2,
+  windDirection: 'WSW',
+  windDeg: 245,
+  condition: 'Convective Clouds',
+  description: 'scattered thunderstorm clouds',
+  icon: '03d',
+  visibilityKm: 9.0,
+  source: 'Ambient AWS Ground Reference',
+  fetchedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+}
 }
 
 // Export rate limiter status for UI diagnostics
